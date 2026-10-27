@@ -1,0 +1,142 @@
+<div class="navbar-glass navbar navbar-expand-lg px-0 px-lg-4">
+    <div class="container-fluid px-lg-0">
+        <div class="d-flex align-items-center gap-4">
+            <!-- Mobile: open offcanvas -->
+            <div class="d-block d-lg-none">
+                <a class="text-inherit" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button"
+                   aria-controls="offcanvasExample" aria-label="Open menu">
+                    <i class="ti ti-menu-2 fs-3"></i>
+                </a>
+            </div>
+            <!-- Desktop: collapse sidebar -->
+            <div class="d-none d-lg-block">
+                <a class="sidebar-toggle d-flex texttooltip p-3" href="javascript:void(0)"
+                   data-template="collapseMessage" aria-label="Toggle sidebar">
+                    <span class="collapse-mini"><i class="ti ti-arrow-bar-left text-secondary fs-5"></i></span>
+                    <span class="collapse-expanded">
+                        <i class="ti ti-arrow-bar-right text-secondary fs-5"></i>
+                        <div id="collapseMessage" class="d-none"><span class="small">Collapse</span></div>
+                    </span>
+                </a>
+            </div>
+        </div>
+
+        <ul class="list-unstyled d-flex align-items-center mb-0 gap-2">
+            <!-- Search -->
+            <li>
+                <button type="button" class="btn btn-white" data-bs-toggle="modal" data-bs-target="#searchModal">
+                    <i class="ti ti-search"></i>
+                    <small class="ms-1">⌘K</small>
+                </button>
+            </li>
+
+            <!-- Light / dark -->
+            <li>
+                <div class="dropdown">
+                    <button class="btn btn-ghost btn-icon rounded-circle d-flex align-items-center" type="button"
+                            aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (auto)">
+                        <i class="ti theme-icon-active lh-1 fs-5"><i class="ti theme-icon ti-sun"></i></i>
+                        <span class="visually-hidden bs-theme-text">Toggle theme</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow">
+                        <li>
+                            <button type="button" class="dropdown-item d-flex align-items-center active"
+                                    data-bs-theme-value="light" aria-pressed="true">
+                                <i class="ti theme-icon ti-sun"></i><span class="ms-2">Light</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item d-flex align-items-center"
+                                    data-bs-theme-value="dark" aria-pressed="false">
+                                <i class="ti theme-icon ti-moon-stars"></i><span class="ms-2">Dark</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item d-flex align-items-center"
+                                    data-bs-theme-value="auto" aria-pressed="false">
+                                <i class="ti theme-icon ti-circle-half-2"></i><span class="ms-2">Auto</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- Notifications -->
+            <li>
+                <a class="position-relative btn-icon btn-ghost btn rounded-circle" data-bs-toggle="offcanvas"
+                   href="#offcanvasNotification" role="button" aria-controls="offcanvasNotification"
+                   aria-label="Notifications">
+                    <i class="ti ti-bell fs-5"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger mt-2 ms-n2">
+                        2<span class="visually-hidden">unread messages</span>
+                    </span>
+                </a>
+            </li>
+
+            <!-- User menu -->
+            <li class="ms-3 dropdown">
+                <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="User menu">
+                    <img src="~/assets/images/avatar/avatar-1.jpg" alt="" class="avatar avatar-sm rounded-circle" />
+                </a>
+                <div class="dropdown-menu dropdown-menu-end dropdown-menu-md p-0">
+                    <div class="d-flex gap-3 align-items-center border-dashed border-bottom px-4 py-4">
+                        <img src="~/assets/images/avatar/avatar-1.jpg" alt="" class="avatar avatar-md rounded-circle" />
+                        <h4 class="mb-0 fs-5">@(User.Identity?.Name ?? "Guest")</h4>
+                    </div>
+                    <div class="p-3 d-flex flex-column gap-1">
+                        <a asp-controller="Home" asp-action="Index" class="dropdown-item d-flex align-items-center gap-2">
+                            <i class="ti ti-home-2 fs-5"></i><span>Home</span>
+                        </a>
+                        <a asp-controller="Account" asp-action="Profile" class="dropdown-item d-flex align-items-center gap-2">
+                            <i class="ti ti-settings fs-5"></i><span>Account Settings</span>
+                        </a>
+                    </div>
+                    <div class="border-dashed border-top mb-4 pt-4 px-6">
+                        @* Logout should normally be a POST form; adjust to your auth setup *@
+                        <a asp-controller="Account" asp-action="Logout" class="text-secondary d-flex align-items-center gap-2">
+                            <i class="ti ti-logout-2 fs-5"></i><span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- Notifications offcanvas (sample data: replace with a view component / model) -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNotification"
+     aria-labelledby="offcanvasNotificationLabel">
+    <div class="sticky-top bg-body">
+        <div class="offcanvas-header gap-4">
+            <h5 class="mb-0" id="offcanvasNotificationLabel">Notifications</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+    </div>
+    <div class="list-group list-group-flush">
+        <a href="#" class="list-group-item list-group-item-action p-5 border-dashed border-bottom">
+            <div class="d-flex flex-column gap-1">
+                <div>New message from John Doe</div>
+                <small class="text-secondary">2 minutes ago</small>
+            </div>
+        </a>
+        <a href="#" class="list-group-item list-group-item-action p-5 border-dashed border-bottom">
+            <div class="d-flex flex-column gap-1">
+                <div>Your password will expire soon.</div>
+                <small class="text-secondary">2 minutes ago</small>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Search modal -->
+<div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <input type="search" class="form-control border-0 rounded-0 ps-0 form-focus-none"
+                       id="globalSearchInput" placeholder="Search any word..." aria-label="Search" />
+                <button type="button" class="btn btn-white btn-sm" data-bs-dismiss="modal" aria-label="Close">Esc</button>
+            </div>
+        </div>
+    </div>
+</div>

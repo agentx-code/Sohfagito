@@ -1,0 +1,99 @@
+﻿@model solfagito_learn.Models.Users.UsersViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Users";
+    var page = Model.page;
+    var pageSize = Model.pageSize;
+    var totalUser = Model.totalUsers;
+    var Search = Model.search;
+
+    // Calculate dynamic values for the entries info
+    int startEntry = ((page - 1) * pageSize) + 1;
+    int endEntry = Math.Min(page * pageSize, totalUser);
+    if (totalUser == 0) startEntry = 0;
+}
+
+<div class="container">
+    <div class="form-control">
+        <!-- Search and Filter -->
+        <div class="toolbar">
+            <form asp-action="Users" asp-controller="Admin" method="get">
+                <div class="search-box">
+                    <input type="search" name="search" id="searchInput" value="@Search" placeholder="Search name, email or role..." aria-label="Search users">
+                    <input type="hidden" name="pageSize" value="@pageSize" />
+                </div>
+            </form>
+            <div class="d-flex">
+                <div class="entries">
+                    <form asp-action="Users" asp-controller="Admin" method="get" id="pageSizeForm">
+                        <input type="hidden" name="search" value="@Search" />
+                        <select name="pageSize" id="pageSize" onchange="this.form.submit()">
+                            <option value="5" selected="@(pageSize == 5 ? "selected" : null)">5</option>
+                            <option value="10" selected="@(pageSize == 10 ? "selected" : null)">10</option>
+                            <option value="15" selected="@(pageSize == 15 ? "selected" : null)">15</option>
+                        </select> Filter
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Sno.</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="usersTable">
+                @{
+                    int Sno = startEntry;
+                }
+                @foreach (var items in Model.User)
+                {
+                    <tr>
+                        <td>@Sno</td>
+                        <td>@items.Name</td>
+                        <td>@items.Email</td>
+                        <td>@items.Phone</td>
+                        <td>@items.Role?.Role_name</td>
+                        <td>@items.Status</td>
+                        <td>
+                            <!-- Add your actions here (e.g., Edit / Delete buttons) -->
+                            <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@items.Id">Edit</a>
+                        </td>
+                    </tr>
+                    Sno++;
+                }
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="table-footer">
+            <div id="tableInfo">
+                Showing @startEntry to @endEntry of @totalUser entries
+            </div>
+            <div class="pagination">
+                @{
+                    int totalPages = (int)Math.Ceiling((double)totalUser / pageSize);
+                    int prevPage = page - 1;
+                    int nextPage = page + 1;
+                }
+
+                <a asp-action="Users" asp-controller="Admin" asp-route-page="@prevPage" asp-route-pageSize="@pageSize" asp-route-search="@Search" class="page-btn @(page <= 1 ? "disabled" : "")">Previous</a>
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <a asp-action="Users" asp-controller="Admin" asp-route-page="@i" asp-route-pageSize="@pageSize" asp-route-search="@Search" class="page-btn @(page == i ? "active" : "")">@i</a>
+                }
+
+                <a asp-action="Users" asp-controller="Admin" asp-route-page="@nextPage" asp-route-pageSize="@pageSize" asp-route-search="@Search" class="page-btn @(page >= totalPages ? "disabled" : "")">Next</a>
+            </div>
+        </div>
+    </div>
+</div>

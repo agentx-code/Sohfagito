@@ -1,0 +1,218 @@
+﻿@model solfagito_learn.Models.Products.CategoryViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Categorys";
+    var page = Model.page;
+    var pageSize = Model.pageSize;
+    var totalUser = Model.totalItems;
+    var Search = Model.search;
+
+    // Calculate dynamic values for the entries info
+    int startEntry = ((page - 1) * pageSize) + 1;
+    int endEntry = Math.Min(page * pageSize, totalUser);
+    if (totalUser == 0) startEntry = 0;
+}
+
+<div class="container">
+    <div class="form-control">
+        <!-- Search and Filter -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Create
+        </button>
+
+        <div class="toolbar">
+            <form asp-action="Category" asp-controller="Admin" method="get">
+                <div class="search-box">
+                    <input type="search" name="search" id="searchInput" value="@Search" placeholder="Search name, email or role..." aria-label="Search users">
+                    <input type="hidden" name="pageSize" value="@pageSize" />
+                </div>
+            </form>
+            <div class="d-flex">
+                <div class="entries">
+                    <form asp-action="Category" asp-controller="Admin" method="get" id="pageSizeForm">
+                        <input type="hidden" name="search" value="@Search" />
+                        <select name="pageSize" id="pageSize" onchange="this.form.submit()">
+                            <option value="5" selected="@(pageSize == 5 ? "selected" : null)">5</option>
+                            <option value="10" selected="@(pageSize == 10 ? "selected" : null)">10</option>
+                            <option value="15" selected="@(pageSize == 15 ? "selected" : null)">15</option>
+                        </select> Filter
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Category ID</th>
+                    <th>Name</th>
+                    <th>Image</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Created_At</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="usersTable">
+                @{
+                    int Sno = startEntry;
+                }
+                @foreach (var items in Model.Category)
+                {
+                    <tr>
+                        <td>@Sno</td>
+                        <td>@items.category_name</td>
+                        <td><img src="@items.image" width="50px" alt="@items.category_name" class="category-image"></td>
+                        <td>@items.description</td>
+                        <td>@items.status</td>
+                        <td>@items.created_at.ToString("yyyy-MM-dd")</td>
+                        <td class="text-center">
+                            <a href="@Url.Action("Edit", "Categories", new { id = items.id })" class="btn btn-sm btn-primary">Edit</a>
+                            <a href="@Url.Action("Delete", "Categories", new { id = items.id })" class="btn btn-sm btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                    Sno++;
+                }
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="table-footer">
+            <div id="tableInfo">
+                Showing @startEntry to @endEntry of @totalUser entries
+            </div>
+            <div class="pagination">
+                @{
+                    int totalPages = (int)Math.Ceiling((double)totalUser / pageSize);
+                    int prevPage = page - 1;
+                    int nextPage = page + 1;
+                }
+
+                @* <a asp-action="Category" asp-controller="Admin" asp-route-page="@prevPage" asp-route-pageSize="@pageSize" asp-route-search="@Search" class="page-btn @(page <= 1 ? "disabled" : "")">Previous</a> *@
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <a asp-action="Category" asp-controller="Admin" asp-route-page="@i" asp-route-pageSize="@pageSize" asp-route-search="@Search" class="page-btn @(page == i ? "active" : "")">@i</a>
+                }
+
+                @* <a asp-action="Category" asp-controller="Admin" asp-route-page="@nextPage" asp-route-pageSize="@pageSize" asp-route-search="@Search" class="page-btn @(page >= totalPages ? "disabled" : "")">Next</a> *@
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">CREATE USER</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="CreateProduct" asp-controller="Admin" method="post" enctype="multipart/form-data">
+                    <!-- Hidden Product ID field -->
+                    <input id="formId" name="id" type="hidden" />
+
+                    <!-- Category Dropdown (Populated dynamically) -->
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <select name="category_id" id="formCategoryId" class="form-control" required>
+                            <option value="">-- Select Category --</option>
+                            @if (ViewBag.Categories != null)
+                            {
+                                foreach (var category in Model.Category)
+                                {
+                                    <option value="@category.id">@category.category_name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Product Name -->
+                    <div class="mb-3">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" class="form-control"
+                               name="product_name" id="formProductName"
+                               placeholder="Enter product name" required />
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" id="formDescription"
+                                  class="form-control" rows="3"
+                                  placeholder="Enter product description" required></textarea>
+                    </div>
+
+                    <div class="row">
+                        <!-- Bottle Size (ml) -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Bottle Size (ml)</label>
+                            <input type="number" class="form-control"
+                                   name="bottle_size_ml" id="formBottleSize"
+                                   placeholder="e.g. 750" required />
+                        </div>
+
+                        <!-- Stock -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Stock Quantity</label>
+                            <input type="number" class="form-control"
+                                   name="stock" id="formStock"
+                                   placeholder="Enter available stock" required />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Price -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Original Price</label>
+                            <input type="number" step="0.01" class="form-control"
+                                   name="price" id="formPrice"
+                                   placeholder="0.00" required />
+                        </div>
+
+                        <!-- Discount Price -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Discount Price</label>
+                            <input type="number" step="0.01" class="form-control"
+                                   name="discount_price" id="formDiscountPrice"
+                                   placeholder="0.00" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- SKU -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">SKU (Stock Keeping Unit)</label>
+                            <input type="text" class="form-control"
+                                   name="sku" id="formSku"
+                                   placeholder="Enter SKU number" />
+                        </div>
+
+                        <!-- Status Selection -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Status</label>
+                            <select name="status" id="formStatus" class="form-control">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Is Featured Checkbox -->
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" name="is_featured" value="true" id="formIsFeatured">
+                        <label class="form-check-label" for="formIsFeatured">
+                            Feature this product on homepage
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-info mb-2" id="submitBtn">Save Product</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
